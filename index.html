@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tianfan Wu's graduate portfolio artifact comparing ten foundational machine learning algorithms.">
+  <title>Algorithm Types | Tianfan Wu</title>
+
+  <!-- All styles are embedded so this webpage works as one portable HTML file. -->
+  <style>
+    :root {
+      --navy: #102a43;
+      --navy-2: #173f5f;
+      --paper: #f7f4ed;
+      --white: #ffffff;
+      --coral: #e76f51;
+      --coral-light: #fce5df;
+      --mint: #a8d5c2;
+      --mint-light: #e3f3ed;
+      --gold: #e6b655;
+      --blue: #6aa9d8;
+      --purple: #9985c1;
+      --text-muted: #5d6f7e;
+      --line: rgba(16, 42, 67, 0.15);
+      --shadow: 0 18px 50px rgba(16, 42, 67, 0.12);
+      --radius: 24px;
+      --page: min(1160px, calc(100% - 36px));
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--navy);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3, p { margin-top: 0; }
+    .page { width: var(--page); margin-inline: auto; }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      padding: 9px 14px;
+      color: white;
+      background: var(--navy);
+      border-radius: 8px;
+      transform: translateY(-150%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      color: white;
+      background: rgba(16, 42, 67, 0.97);
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .header-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: var(--coral);
+      border-radius: 50%;
+    }
+
+    nav { display: flex; gap: 26px; font-size: 14px; font-weight: 700; }
+    nav a:hover { color: var(--mint); }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: var(--navy);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 470px;
+      height: 470px;
+      top: -250px;
+      right: -100px;
+      border: 70px solid rgba(168, 213, 194, 0.08);
+      border-radius: 50%;
+    }
+
+    .hero-grid {
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      align-items: center;
+      gap: 70px;
+      padding-block: 76px;
+    }
+
+    .eyebrow, .kicker {
+      margin-bottom: 16px;
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero .eyebrow { color: var(--mint); }
+
+    .hero h1 {
+      max-width: 760px;
+      margin-bottom: 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(48px, 7vw, 82px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero h1 em { color: var(--coral); }
+
+    .hero-intro {
+      max-width: 650px;
+      margin-bottom: 30px;
+      color: rgba(255,255,255,0.76);
+      font-size: 20px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      padding: 0 20px;
+      color: var(--navy);
+      background: var(--mint);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .hero-byline {
+      margin: 21px 0 0;
+      color: rgba(255,255,255,0.55);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-summary {
+      position: relative;
+      z-index: 1;
+      padding: 28px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .big-number {
+      display: block;
+      color: var(--coral);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 96px;
+      line-height: 1;
+    }
+
+    .hero-summary > p { color: rgba(255,255,255,0.68); }
+
+    .domain-list {
+      display: grid;
+      gap: 9px;
+      margin-top: 22px;
+      padding: 18px;
+      background: rgba(0,0,0,0.13);
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .domain-list span::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      margin-right: 9px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .domain-list span:nth-child(2)::before { background: var(--blue); }
+    .domain-list span:nth-child(3)::before { background: var(--mint); }
+    .domain-list span:nth-child(4)::before { background: var(--purple); }
+
+    section { padding-block: 96px; }
+
+    .intro { background: white; }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .intro-copy {
+      padding-left: 28px;
+      color: var(--text-muted);
+      border-left: 3px solid var(--coral);
+      font-size: 18px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 36px;
+      margin-bottom: 40px;
+    }
+
+    .section-heading > p {
+      max-width: 430px;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+    }
+
+    .learning-map {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .learning-type { padding: 48px; }
+    .learning-type + .learning-type { border-left: 1px solid rgba(255,255,255,0.14); }
+    .learning-type:last-child { background: rgba(255,255,255,0.045); }
+
+    .learning-type h3 {
+      margin: 22px 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 31px;
+      line-height: 1.1;
+    }
+
+    .learning-type p { color: rgba(255,255,255,0.7); }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 28px;
+    }
+
+    .flow span {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .flow b { color: var(--coral); }
+    .learning-type:last-child .flow b { color: var(--mint); }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .supervised { color: #943824; background: var(--coral-light); }
+    .unsupervised { color: #28634d; background: var(--mint-light); }
+
+    .algorithms { background: white; }
+
+    .algorithm-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    .card {
+      min-height: 455px;
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      background: white;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .number {
+      color: #9ba7b0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+    }
+
+    .card h3 {
+      margin-bottom: 13px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 32px;
+      line-height: 1.12;
+    }
+
+    .explanation { color: var(--text-muted); }
+
+    .label {
+      margin: 20px 0 8px;
+      color: #7d8b95;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .tag {
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tabular { color: #705012; background: #faedcd; }
+    .vision { color: #275f8b; background: #e2f0fa; }
+    .nlp { color: #2b6650; background: #e3f3ed; }
+    .genai { color: #604a86; background: #ede8f5; }
+
+    .use-case {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .use-case .label { margin-top: 0; }
+
+    .note {
+      max-width: 800px;
+      margin: 28px 0 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .reflection-box {
+      display: grid;
+      grid-template-columns: 0.75fr 1.25fr;
+      gap: 70px;
+      padding: 64px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .reflection-box h2 { margin-bottom: 15px; }
+    .reflection-box > div > p:last-child { color: rgba(255,255,255,0.65); }
+
+    .prompt {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 16px;
+      padding-block: 21px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .prompt:first-child { padding-top: 0; }
+    .prompt:last-child { padding-bottom: 0; border-bottom: 0; }
+    .prompt > span { color: var(--coral); font-family: Georgia, serif; font-size: 20px; }
+    .prompt h3 { margin-bottom: 5px; font-size: 16px; }
+    .prompt p { margin-bottom: 0; color: rgba(255,255,255,0.62); font-size: 14px; }
+
+    footer { color: var(--navy); background: var(--mint); }
+
+    .footer-inner {
+      min-height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      padding-block: 26px;
+    }
+
+    footer p { margin-bottom: 0; font-size: 13px; }
+    footer strong { font-family: Georgia, serif; font-size: 21px; }
+
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+
+    @media (max-width: 850px) {
+      .hero-grid, .intro-grid, .reflection-box { grid-template-columns: 1fr; }
+      .hero-grid { gap: 45px; }
+      .hero-summary { max-width: 500px; }
+      .learning-map { grid-template-columns: 1fr; }
+      .learning-type + .learning-type { border-top: 1px solid rgba(255,255,255,0.14); border-left: 0; }
+      .reflection-box { gap: 40px; }
+    }
+
+    @media (max-width: 650px) {
+      :root { --page: min(100% - 26px, 1160px); }
+      .header-inner { min-height: 64px; }
+      nav a:not(:last-child) { display: none; }
+      .hero-grid { min-height: auto; padding-block: 58px; }
+      .hero h1 { font-size: clamp(45px, 15vw, 62px); }
+      section { padding-block: 72px; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .algorithm-grid { grid-template-columns: 1fr; }
+      .card { min-height: 0; padding: 30px; }
+      .learning-type, .reflection-box { padding: 34px 28px; }
+      .flow { align-items: stretch; flex-direction: column; }
+      .flow b { align-self: center; transform: rotate(90deg); }
+      .footer-inner { align-items: start; flex-direction: column; }
+    }
+
+    @media print {
+      header, .button, footer { display: none; }
+      .hero, .learning-map, .reflection-box { color: black; background: white; border: 1px solid #aaa; box-shadow: none; }
+      .card { min-height: 0; break-inside: avoid; }
+      section, .hero-grid { min-height: auto; padding-block: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header>
+    <div class="page header-inner">
+      <a class="brand" href="#top"><span class="brand-mark">A10</span><span>Algorithm Types</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="#overview">Overview</a>
+        <a href="#algorithms">Algorithms</a>
+        <a href="#reflection">Reflection</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="page hero-grid">
+        <div>
+          <p class="eyebrow">AIML-501-01R3A · Model Development</p>
+          <h1>A field guide to <em>how machines learn.</em></h1>
+          <p class="hero-intro">Ten foundational algorithms, organized by learning type and mapped to the data domains where they create practical value.</p>
+          <a class="button" href="#algorithms">Explore all 10 algorithms</a>
+          <p class="hero-byline">Tianfan Wu · Indiana Wesleyan University · November 1, 2026</p>
+        </div>
+        <aside class="hero-summary" aria-label="Artifact summary">
+          <span class="big-number">10</span>
+          <p>foundational algorithms at a glance</p>
+          <div class="domain-list">
+            <span>Tabular Data</span>
+            <span>Computer Vision</span>
+            <span>Natural Language Processing</span>
+            <span>Generative AI</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="intro">
+      <div class="page intro-grid">
+        <div>
+          <p class="kicker">Why algorithms matter</p>
+          <h2>Different questions require different learning strategies.</h2>
+        </div>
+        <div class="intro-copy">
+          <p>A machine learning algorithm is a procedure for finding useful patterns in data. The right choice depends on the available labels, the desired prediction or pattern, and the structure of the data.</p>
+          <p>From a data analyst's perspective, selection begins with the business question, the available labels, the data structure, and the level of explanation stakeholders need. This framework compares common approaches without treating their categories as rigid boundaries.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview">
+      <div class="page">
+        <div class="section-heading">
+          <div><p class="kicker">01 · Learning map</p><h2>Two ways to discover structure</h2></div>
+          <p>The defining difference is whether the training data includes a target answer.</p>
+        </div>
+        <div class="learning-map">
+          <article class="learning-type">
+            <span class="pill supervised">Supervised</span>
+            <h3>Learn from labeled examples</h3>
+            <p>The model studies inputs paired with known outcomes, then learns a mapping that can predict a label or value for new data.</p>
+            <div class="flow"><span>Labeled data</span><b>→</b><span>Train model</span><b>→</b><span>Predict</span></div>
+          </article>
+          <article class="learning-type">
+            <span class="pill unsupervised">Unsupervised</span>
+            <h3>Find patterns without labels</h3>
+            <p>The model receives inputs without target answers and searches for meaningful groups, compressed representations, or hidden structure.</p>
+            <div class="flow"><span>Raw data</span><b>→</b><span>Find structure</span><b>→</b><span>Discover</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="algorithms" id="algorithms">
+      <div class="page">
+        <div class="section-heading">
+          <div><p class="kicker">02 · Algorithm atlas</p><h2>Ten foundational approaches</h2></div>
+          <p>Each card identifies the learning type, common application domains, operation, and a real-world example.</p>
+        </div>
+
+        <div class="algorithm-grid">
+          <article class="card">
+            <div class="card-top"><span class="number">01</span><span class="pill supervised">Supervised</span></div>
+            <h3>Linear Regression</h3>
+            <p class="explanation">Fits a straight-line relationship between input features and a continuous outcome by minimizing the difference between predicted and actual values.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span></div>
+            <div class="use-case"><p class="label">Example use</p>Estimating a home's sale price from square footage, location, age, and number of rooms.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">02</span><span class="pill supervised">Supervised</span></div>
+            <h3>Gradient Boosting</h3>
+            <p class="explanation">Builds a sequence of small decision trees. Each new tree focuses on the errors left by the earlier trees, and their combined predictions form a strong model.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span></div>
+            <div class="use-case"><p class="label">Example use</p>Predicting customer churn from account activity, service history, demographics, and prior support interactions.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">03</span><span class="pill supervised">Supervised</span></div>
+            <h3>Decision Tree</h3>
+            <p class="explanation">Splits data through a sequence of if–then questions. Each branch narrows the possibilities until a leaf produces a class or numeric prediction.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span></div>
+            <div class="use-case"><p class="label">Example use</p>Supporting loan decisions using income, debt, credit history, and employment data.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">04</span><span class="pill supervised">Supervised</span></div>
+            <h3>Random Forest</h3>
+            <p class="explanation">Trains many decision trees on varied samples and feature subsets, then combines their outputs to improve accuracy and reduce overfitting.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span><span class="tag vision">Computer Vision</span></div>
+            <div class="use-case"><p class="label">Example use</p>Flagging potentially fraudulent card transactions from behavioral and transaction features.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">05</span><span class="pill supervised">Supervised</span></div>
+            <h3>Support Vector Machine</h3>
+            <p class="explanation">Finds the boundary that separates classes with the widest possible margin; kernel functions can create curved boundaries for complex data.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span><span class="tag vision">Computer Vision</span><span class="tag nlp">NLP</span></div>
+            <div class="use-case"><p class="label">Example use</p>Classifying email as spam or legitimate from word-frequency features.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">06</span><span class="pill supervised">Supervised</span></div>
+            <h3>Transformer Models (BERT/GPT)</h3>
+            <p class="explanation">Uses attention to weigh relationships among words or tokens across an entire sequence. BERT emphasizes language understanding, while GPT predicts the next token to generate language.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag nlp">NLP</span><span class="tag genai">Generative AI</span></div>
+            <div class="use-case"><p class="label">Example use</p>Summarizing thousands of customer comments, classifying sentiment, and drafting an analyst's first-pass findings.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">07</span><span class="pill supervised">Supervised</span></div>
+            <h3>Convolutional Neural Network</h3>
+            <p class="explanation">Learns small visual filters that detect local patterns such as edges and textures, then combines them into increasingly complex image features.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag vision">Computer Vision</span><span class="tag genai">Generative AI</span></div>
+            <div class="use-case"><p class="label">Example use</p>Detecting manufacturing defects in labeled product images before items leave the production line.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">08</span><span class="pill unsupervised">Unsupervised</span></div>
+            <h3>K-Means Clustering</h3>
+            <p class="explanation">Assigns observations to the nearest of K cluster centers, then repeatedly updates those centers until the groups stabilize.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span><span class="tag vision">Computer Vision</span></div>
+            <div class="use-case"><p class="label">Example use</p>Grouping retail customers into behavioral segments for tailored marketing strategies.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">09</span><span class="pill unsupervised">Unsupervised</span></div>
+            <h3>Principal Component Analysis</h3>
+            <p class="explanation">Rotates high-dimensional data onto new axes that preserve as much variation as possible, allowing fewer dimensions to represent most of the information.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag tabular">Tabular Data</span><span class="tag vision">Computer Vision</span><span class="tag nlp">NLP</span></div>
+            <div class="use-case"><p class="label">Example use</p>Reducing hundreds of sensor variables before visualizing or modeling equipment behavior.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-top"><span class="number">10</span><span class="pill unsupervised">Unsupervised</span></div>
+            <h3>GANs &amp; Diffusion Models</h3>
+            <p class="explanation">A GAN trains a generator against a discriminator, while a diffusion model learns to reverse a gradual noising process. Both learn a data distribution and create new samples.</p>
+            <p class="label">Application domains</p><div class="tags"><span class="tag vision">Computer Vision</span><span class="tag genai">Generative AI</span></div>
+            <div class="use-case"><p class="label">Example use</p>Creating product-concept images and privacy-conscious synthetic images for design exploration or model testing.</div>
+          </article>
+        </div>
+
+        <p class="note"><strong>Classification note:</strong> These labels follow the assignment's supervised/unsupervised framework. Transformer pretraining is commonly self-supervised, and generative models can also be adapted through supervised fine-tuning or human feedback.</p>
+      </div>
+    </section>
+
+    <!-- Add future portfolio workshop sections here. -->
+    <section id="reflection">
+      <div class="page reflection-box">
+        <div>
+          <p class="kicker">03 · Personal synthesis</p>
+          <h2>Reflection</h2>
+          <p>This reflection connects the technical framework to my work as a data analyst and to the professional value of a portfolio artifact.</p>
+        </div>
+        <div>
+          <div class="prompt"><span>01</span><div><h3>What I learned</h3><p>Creating this framework clarified that an algorithm should be classified along more than one dimension. Learning style explains whether the model learns from labeled outcomes or discovers structure without labels, while the application domain describes the form of the data and the problem being solved. A decision tree and a convolutional neural network can both be supervised, yet one is usually strongest with structured tables and the other with images. I also learned that generative AI extends beyond chatbots: transformers, GANs, and diffusion models learn patterns that can produce new text or images.</p></div></div>
+          <div class="prompt"><span>02</span><div><h3>How I would select a model</h3><p>As a data analyst, I would begin with the decision the organization needs to make, then determine whether a reliable target variable exists. For labeled tabular data, I would compare an interpretable baseline such as linear regression or a decision tree with stronger ensemble methods such as random forests and gradient boosting. For unlabeled exploration, I would consider K-means or PCA. I would evaluate performance with measures appropriate to the task, use validation data to detect overfitting, and balance accuracy against interpretability, fairness, cost, privacy, and deployment constraints.</p></div></div>
+          <div class="prompt"><span>03</span><div><h3>Professional application and growth</h3><p>This artifact strengthened my ability to translate technical choices into language that managers and other stakeholders can use. In future analytics projects, I can use this framework to explain why customer segmentation, image inspection, sentiment analysis, and content generation require different tools. It also reminds me to monitor data quality and model drift after deployment rather than treating model selection as a one-time decision. Presenting the work as a portfolio artifact demonstrates both technical knowledge and communication skill, and it gives me a scalable foundation for documenting future workshops and projects.</p></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page footer-inner">
+      <div><strong>Tianfan Wu</strong><p>DeVoe School of Business, Technology and Leadership · Indiana Wesleyan University</p></div>
+      <p><strong>AIML-501-01R3A: Model Development</strong><br>Dr. Metzger · November 1, 2026</p>
+      <a href="#top"><strong>Back to top ↑</strong></a>
+    </div>
+  </footer>
+</body>
+</html>
