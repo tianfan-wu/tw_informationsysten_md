@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="Tianfan Wu's Model Development portfolio artifact explaining neural-network architecture, training, and visualization."
+  >
+
+  <title>Visualizing Neural Networks | Tianfan Wu</title>
+
+  <style>
+    :root {
+      --navy: #102a43;
+      --navy-light: #173f5f;
+      --paper: #f7f4ed;
+      --white: #ffffff;
+      --coral: #e76f51;
+      --coral-light: #fce5df;
+      --mint: #a8d5c2;
+      --blue: #6aa9d8;
+      --gold: #e6b655;
+      --purple: #9985c1;
+      --muted: #5d6f7e;
+      --line: rgba(16, 42, 67, 0.15);
+      --shadow: 0 18px 50px rgba(16, 42, 67, 0.12);
+      --radius: 24px;
+      --page: min(1160px, calc(100% - 36px));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--navy);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .page {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      padding: 10px 14px;
+      color: white;
+      background: var(--navy);
+      border-radius: 8px;
+      transform: translateY(-150%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      color: white;
+      background: rgba(16, 42, 67, 0.97);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .header-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      background: var(--mint);
+      border-radius: 50%;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 800;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    nav a:hover {
+      color: var(--mint);
+    }
+
+    .portfolio-link {
+      padding: 8px 14px;
+      color: var(--navy);
+      background: var(--mint);
+      border-radius: 999px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: var(--navy);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 550px;
+      height: 550px;
+      top: -350px;
+      right: -170px;
+      border: 75px solid rgba(168, 213, 194, 0.07);
+      border-radius: 50%;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      min-height: 610px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: center;
+      gap: 70px;
+      padding-block: 80px;
+    }
+
+    .eyebrow,
+    .kicker {
+      margin-bottom: 16px;
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero .eyebrow {
+      color: var(--mint);
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin-bottom: 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(48px, 7vw, 80px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    .hero h1 em {
+      color: var(--coral);
+    }
+
+    .hero-intro {
+      max-width: 650px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 20px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      padding: 0 20px;
+      color: var(--navy);
+      background: var(--mint);
+      border: 1px solid var(--mint);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .button.secondary {
+      color: white;
+      background: transparent;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .byline {
+      margin-top: 22px;
+      color: rgba(255, 255, 255, 0.56);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .network-visual {
+      display: grid;
+      grid-template-columns: repeat(7, auto);
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      min-height: 380px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .layer {
+      display: grid;
+      gap: 20px;
+    }
+
+    .node {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      font-weight: 800;
+    }
+
+    .input-node {
+      background: var(--mint);
+    }
+
+    .hidden-one {
+      background: var(--blue);
+    }
+
+    .hidden-two {
+      background: var(--coral);
+    }
+
+    .output-node {
+      background: var(--gold);
+    }
+
+    .arrow {
+      color: var(--mint);
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    section {
+      padding-block: 96px;
+    }
+
+    section:nth-of-type(even) {
+      background: white;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.07;
+      letter-spacing: -0.03em;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 44px;
+    }
+
+    .section-heading > p {
+      max-width: 440px;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .flow-grid,
+    .training-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 230px;
+      padding: 30px 25px;
+      color: white;
+      background: var(--navy);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 45%;
+      right: -29px;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      background: var(--mint);
+      border-radius: 50%;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .step-number {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    .flow-step h3 {
+      margin: 24px 0 10px;
+      font-family: Georgia, serif;
+      font-size: 25px;
+      line-height: 1.1;
+    }
+
+    .flow-step p {
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+    }
+
+    .neuron-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .neuron-diagram {
+      display: grid;
+      grid-template-columns: auto 45px auto 45px auto 45px auto;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      min-height: 330px;
+      padding: 35px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .inputs {
+      display: grid;
+      gap: 24px;
+    }
+
+    .math-node {
+      width: 88px;
+      height: 88px;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      background: var(--paper);
+      border: 2px solid var(--coral);
+      border-radius: 50%;
+      font-family: Georgia, serif;
+      font-size: 42px;
+      font-weight: 800;
+    }
+
+    .activation {
+      min-width: 120px;
+      padding: 24px;
+      color: white;
+      background: var(--coral);
+      border: 2px solid var(--paper);
+      border-radius: 18px;
+      text-align: center;
+      font-family: Georgia, serif;
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .formula-card {
+      padding: 34px;
+      background: var(--coral-light);
+      border-left: 5px solid var(--coral);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .formula {
+      color: var(--navy);
+      font-family: Georgia, serif;
+      font-size: clamp(26px, 3vw, 37px);
+      font-weight: 700;
+    }
+
+    .formula.accent {
+      color: var(--coral);
+      font-style: italic;
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    .component {
+      min-height: 260px;
+      padding: 34px;
+      background: white;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .component:nth-child(2),
+    .component:nth-child(5) {
+      background: #fbfaf6;
+    }
+
+    .component .number {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 22px;
+    }
+
+    .component h3 {
+      margin: 24px 0 12px;
+      font-family: Georgia, serif;
+      font-size: 27px;
+      line-height: 1.1;
+    }
+
+    .component p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .component strong {
+      color: var(--navy);
+    }
+
+    .training-panel {
+      padding: 48px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .training-step {
+      position: relative;
+      min-height: 170px;
+      padding: 24px 20px;
+      color: var(--navy);
+      border-radius: 17px;
+    }
+
+    .training-step:nth-child(1) {
+      background: var(--mint);
+    }
+
+    .training-step:nth-child(2) {
+      background: var(--blue);
+    }
+
+    .training-step:nth-child(3) {
+      background: var(--coral);
+    }
+
+    .training-step:nth-child(4) {
+      background: var(--gold);
+    }
+
+    .training-step h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .training-step p {
+      margin-bottom: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .training-note {
+      margin: 28px 0 0;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.78);
+      font-weight: 700;
+    }
+
+    .experiment-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .experiment {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 18px;
+      padding: 23px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .experiment > span {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .experiment:nth-child(2) > span {
+      color: var(--blue);
+    }
+
+    .experiment:nth-child(3) > span {
+      color: var(--gold);
+    }
+
+    .experiment:nth-child(4) > span {
+      color: var(--purple);
+    }
+
+    .experiment h3 {
+      margin-bottom: 5px;
+      font-size: 20px;
+    }
+
+    .experiment p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .capacity-card {
+      padding: 38px;
+      background: #e9f0f2;
+      border-radius: var(--radius);
+    }
+
+    .capacity-card > p {
+      color: var(--coral);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .capacity-examples {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .capacity-example {
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      padding: 15px;
+      background: white;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .boundary {
+      width: 100px;
+      height: 100px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background:
+        radial-gradient(circle at 25% 30%, var(--coral) 0 7px, transparent 8px),
+        radial-gradient(circle at 70% 25%, var(--coral) 0 7px, transparent 8px),
+        radial-gradient(circle at 35% 70%, var(--blue) 0 7px, transparent 8px),
+        radial-gradient(circle at 75% 75%, var(--blue) 0 7px, transparent 8px);
+      border: 3px solid var(--navy);
+      border-radius: 50%;
+    }
+
+    .capacity-example:first-child .boundary {
+      border-radius: 0;
+      border-width: 0 0 4px;
+      transform: rotate(-18deg);
+    }
+
+    .capacity-example:last-child .boundary {
+      border-style: dashed;
+      border-radius: 35% 65% 55% 45%;
+    }
+
+    .capacity-example strong {
+      display: block;
+      margin-top: 14px;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .legend-item {
+      padding: 30px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .legend-dot {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      margin-right: 10px;
+      background: var(--blue);
+      border-radius: 50%;
+    }
+
+    .legend-item:nth-child(2) .legend-dot {
+      background: var(--coral);
+    }
+
+    .legend-item:nth-child(3) .legend-dot {
+      background: var(--gold);
+    }
+
+    .legend-item:nth-child(4) .legend-dot {
+      background: var(--mint);
+    }
+
+    .legend-item h3 {
+      display: inline;
+      font-size: 21px;
+    }
+
+    .legend-item p {
+      margin: 14px 0 0;
+      color: var(--muted);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 55px;
+    }
+
+    .summary-point {
+      display: grid;
+      grid-template-columns: 55px 1fr;
+      gap: 18px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .summary-point > span {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .summary-point:nth-child(2) > span {
+      color: var(--blue);
+    }
+
+    .summary-point:nth-child(3) > span {
+      color: var(--gold);
+    }
+
+    .summary-point h3 {
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .summary-point p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .continuity-card {
+      padding: 48px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .continuity-card h3 {
+      margin: 24px 0 18px;
+      font-family: Georgia, serif;
+      font-size: clamp(32px, 4vw, 46px);
+      line-height: 1.05;
+    }
+
+    .continuity-card p {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .continuity-card a {
+      color: var(--coral);
+      font-weight: 800;
+    }
+
+    .reflection-box {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 65px;
+      padding: 62px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .reflection-box h2 {
+      margin-bottom: 14px;
+    }
+
+    .reflection-meta {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .reflection-copy {
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 17px;
+    }
+
+    .references {
+      background: white;
+    }
+
+    .reference-list {
+      max-width: 930px;
+      display: grid;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .reference-list p {
+      margin-bottom: 0;
+      padding-left: 36px;
+      text-indent: -36px;
+    }
+
+    .reference-list a {
+      color: var(--navy-light);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    footer {
+      color: var(--navy);
+      background: var(--mint);
+    }
+
+    .footer-inner {
+      min-height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      padding-block: 26px;
+    }
+
+    footer p {
+      margin-bottom: 0;
+      font-size: 13px;
+    }
+
+    footer strong {
+      font-family: Georgia, serif;
+      font-size: 20px;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .neuron-grid,
+      .experiment-grid,
+      .summary-grid,
+      .reflection-box {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-grid,
+      .training-grid,
+      .component-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 660px) {
+      :root {
+        --page: min(100% - 26px, 1160px);
+      }
+
+      nav a:not(.portfolio-link) {
+        display: none;
+      }
+
+      .hero-grid {
+        min-height: auto;
+        padding-block: 58px;
+      }
+
+      section {
+        padding-block: 72px;
+      }
+
+      .section-heading {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .flow-grid,
+      .training-grid,
+      .component-grid,
+      .legend-grid,
+      .capacity-examples {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step:not(:last-child)::after {
+        display: none;
+      }
+
+      .network-visual {
+        transform: scale(0.86);
+      }
+
+      .training-panel,
+      .reflection-box,
+      .continuity-card {
+        padding: 30px 24px;
+      }
+
+      .footer-inner {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      header,
+      .button-row,
+      footer {
+        display: none;
+      }
+
+      .hero,
+      .training-panel,
+      .continuity-card,
+      .reflection-box {
+        color: black;
+        background: white;
+        border: 1px solid #aaa;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header>
+    <div class="page header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark">NN</span>
+        <span>Visualizing Neural Networks</span>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="#architecture">Architecture</a>
+        <a href="#components">Components</a>
+        <a href="#playground">Playground</a>
+        <a href="#reflection">Reflection</a>
+        <a class="portfolio-link" href="index.html">Algorithm Guide</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="page hero-grid">
+        <div>
+          <p class="eyebrow">
+            A2.4 · Portfolio Artifact · Model Development
+          </p>
+
+          <h1>Visualizing <em>Neural Networks</em></h1>
+
+          <p class="hero-intro">
+            An accessible visual guide to network architecture, training
+            dynamics, and the model behaviors revealed through Neural Network
+            Playground.
+          </p>
+
+          <div class="button-row">
+            <a class="button" href="#architecture">Follow the data flow</a>
+            <a class="button secondary" href="#playground">
+              Review experiments
+            </a>
+          </div>
+
+          <p class="byline">
+            Tianfan Wu · Indiana Wesleyan University · AIML-501-01R3A
+          </p>
+        </div>
+
+        <div
+          class="network-visual"
+          role="img"
+          aria-label="Three input nodes pass data through two hidden layers to an output node"
+        >
+          <div class="layer">
+            <span class="node input-node">x₁</span>
+            <span class="node input-node">x₂</span>
+            <span class="node input-node">x₃</span>
+          </div>
+
+          <span class="arrow">→</span>
+
+          <div class="layer">
+            <span class="node hidden-one"></span>
+            <span class="node hidden-one"></span>
+            <span class="node hidden-one"></span>
+            <span class="node hidden-one"></span>
+          </div>
+
+          <span class="arrow">→</span>
+
+          <div class="layer">
+            <span class="node hidden-two"></span>
+            <span class="node hidden-two"></span>
+            <span class="node hidden-two"></span>
+          </div>
+
+          <span class="arrow">→</span>
+
+          <div class="layer">
+            <span class="node output-node">ŷ</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">01 · Network architecture</p>
+            <h2>How data moves through the model</h2>
+          </div>
+
+          <p>
+            A forward pass converts raw feature values into a prediction
+            through successive learned transformations.
+          </p>
+        </div>
+
+        <div class="flow-grid">
+          <article class="flow-step">
+            <span class="step-number">01</span>
+            <h3>Receive inputs</h3>
+            <p>
+              The input layer holds measured features such as pixel values,
+              customer attributes, or encoded words.
+            </p>
+          </article>
+
+          <article class="flow-step">
+            <span class="step-number">02</span>
+            <h3>Compute weighted sums</h3>
+            <p>
+              Each hidden neuron multiplies incoming values by weights and
+              adds a learned bias.
+            </p>
+          </article>
+
+          <article class="flow-step">
+            <span class="step-number">03</span>
+            <h3>Apply activation</h3>
+            <p>
+              A nonlinear activation transforms the weighted sum so the
+              network can learn curved and complex patterns.
+            </p>
+          </article>
+
+          <article class="flow-step">
+            <span class="step-number">04</span>
+            <h3>Produce output</h3>
+            <p>
+              The output layer returns a class probability, numeric estimate,
+              or another task-specific prediction.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="neuron">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">02 · Inside one neuron</p>
+            <h2>A small computation with a large role</h2>
+          </div>
+
+          <p>
+            Every neuron combines evidence, shifts its activation threshold,
+            and passes a transformed signal forward.
+          </p>
+        </div>
+
+        <div class="neuron-grid">
+          <div
+            class="neuron-diagram"
+            role="img"
+            aria-label="Weighted inputs enter a summation node, activation function, and output"
+          >
+            <div class="inputs">
+              <span class="node input-node">x₁</span>
+              <span class="node hidden-one">x₂</span>
+              <span class="node output-node">x₃</span>
+            </div>
+
+            <span class="arrow">→</span>
+            <span class="math-node">Σ</span>
+            <span class="arrow">→</span>
+            <span class="activation">f(z)</span>
+            <span class="arrow">→</span>
+            <span class="node output-node">a</span>
+          </div>
+
+          <aside class="formula-card">
+            <p class="kicker">Neuron mathematics</p>
+
+            <p class="formula">
+              z = w₁x₁ + w₂x₂ + w₃x₃ + b
+            </p>
+
+            <p class="formula accent">a = f(z)</p>
+
+            <p>
+              <strong>Weights</strong> control the strength and direction of
+              each input. The <strong>bias</strong> shifts when the neuron
+              activates, while the activation function produces the signal
+              sent to the next layer.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="components">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">03 · Core components</p>
+            <h2>Architecture defines the computation</h2>
+          </div>
+
+          <p>
+            Training determines the parameter values that make the network
+            useful for a specific prediction task.
+          </p>
+        </div>
+
+        <div class="component-grid">
+          <article class="component">
+            <span class="number">01</span>
+            <h3>Layers</h3>
+            <p>
+              <strong>Input layers</strong> receive features,
+              <strong>hidden layers</strong> learn intermediate
+              representations, and <strong>output layers</strong> match the
+              prediction task.
+            </p>
+          </article>
+
+          <article class="component">
+            <span class="number">02</span>
+            <h3>Neurons</h3>
+            <p>
+              Nodes compute a weighted sum plus a bias and then apply an
+              activation function. Together, many neurons learn distributed
+              patterns.
+            </p>
+          </article>
+
+          <article class="component">
+            <span class="number">03</span>
+            <h3>Weights and biases</h3>
+            <p>
+              These trainable values determine the strength of connections
+              and the thresholds at which neurons respond.
+            </p>
+          </article>
+
+          <article class="component">
+            <span class="number">04</span>
+            <h3>Activation functions</h3>
+            <p>
+              <strong>ReLU</strong>, max(0, z), is efficient in hidden layers.
+              <strong>Sigmoid</strong> maps an output to 0–1 and is useful for
+              binary probabilities.
+            </p>
+          </article>
+
+          <article class="component">
+            <span class="number">05</span>
+            <h3>Loss functions</h3>
+            <p>
+              <strong>Mean squared error</strong> measures regression error.
+              <strong>Cross-entropy</strong> penalizes probability assigned
+              away from the correct class.
+            </p>
+          </article>
+
+          <article class="component">
+            <span class="number">06</span>
+            <h3>Optimization</h3>
+            <p>
+              <strong>SGD</strong> follows gradients estimated from data
+              batches. <strong>Adam</strong> adapts the update size using
+              first- and second-moment estimates.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="training">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">04 · Training dynamics</p>
+            <h2>Learning is a measured cycle</h2>
+          </div>
+
+          <p>
+            The network repeats prediction and correction until validation
+            performance stabilizes.
+          </p>
+        </div>
+
+        <div class="training-panel">
+          <div class="training-grid">
+            <article class="training-step">
+              <h3>1 · Forward pass</h3>
+              <p>
+                Compute predictions using the network's current weights and
+                biases.
+              </p>
+            </article>
+
+            <article class="training-step">
+              <h3>2 · Loss</h3>
+              <p>
+                Compare predictions with target values and summarize the
+                error.
+              </p>
+            </article>
+
+            <article class="training-step">
+              <h3>3 · Backpropagation</h3>
+              <p>
+                Use the chain rule to calculate how each parameter contributed
+                to the error.
+              </p>
+            </article>
+
+            <article class="training-step">
+              <h3>4 · Optimizer</h3>
+              <p>
+                Update weights and biases in the direction expected to reduce
+                the loss.
+              </p>
+            </article>
+          </div>
+
+          <p class="training-note">
+            One epoch is one complete pass through the training set. A widening
+            gap between training and validation loss can signal overfitting.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="playground">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">05 · Neural Network Playground</p>
+            <h2>Controlled experiments reveal model behavior</h2>
+          </div>
+
+          <p>
+            Changing one setting at a time makes the relationship between data
+            difficulty and model capacity easier to interpret.
+          </p>
+        </div>
+
+        <div class="experiment-grid">
+          <div>
+            <article class="experiment">
+              <span>01</span>
+              <div>
+                <h3>Data geometry</h3>
+                <p>
+                  Linearly separated clusters need a simple boundary. Circles
+                  and spirals require nonlinear transformations.
+                </p>
+              </div>
+            </article>
+
+            <article class="experiment">
+              <span>02</span>
+              <div>
+                <h3>Noise</h3>
+                <p>
+                  Greater overlap weakens class separation and makes test
+                  performance less stable.
+                </p>
+              </div>
+            </article>
+
+            <article class="experiment">
+              <span>03</span>
+              <div>
+                <h3>Feature selection</h3>
+                <p>
+                  Squared or interaction features can expose a pattern that
+                  raw x₁ and x₂ do not represent directly.
+                </p>
+              </div>
+            </article>
+
+            <article class="experiment">
+              <span>04</span>
+              <div>
+                <h3>Layer depth</h3>
+                <p>
+                  Additional neurons increase capacity, but unnecessary depth
+                  adds computation and overfitting risk.
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <div class="capacity-card">
+            <p>Model capacity</p>
+
+            <div class="capacity-examples">
+              <div class="capacity-example">
+                <div>
+                  <div class="boundary"></div>
+                  <strong>Underfit</strong>
+                </div>
+              </div>
+
+              <div class="capacity-example">
+                <div>
+                  <div class="boundary"></div>
+                  <strong>Useful fit</strong>
+                </div>
+              </div>
+
+              <div class="capacity-example">
+                <div>
+                  <div class="boundary"></div>
+                  <strong>Overfit</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="interpretation">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">06 · Reading the visualization</p>
+            <h2>Learned patterns become visible</h2>
+          </div>
+
+          <p>
+            The display exposes both intermediate representations and warning
+            signals during training.
+          </p>
+        </div>
+
+        <div class="legend-grid">
+          <article class="legend-item">
+            <span class="legend-dot"></span>
+            <h3>Node heatmaps</h3>
+            <p>
+              Show which input regions activate each neuron and how hidden
+              features change across layers.
+            </p>
+          </article>
+
+          <article class="legend-item">
+            <span class="legend-dot"></span>
+            <h3>Connection lines</h3>
+            <p>
+              Color indicates the sign of a weight; thickness indicates its
+              magnitude.
+            </p>
+          </article>
+
+          <article class="legend-item">
+            <span class="legend-dot"></span>
+            <h3>Decision surface</h3>
+            <p>
+              Background color represents the predicted class and confidence
+              across feature space.
+            </p>
+          </article>
+
+          <article class="legend-item">
+            <span class="legend-dot"></span>
+            <h3>Training and test loss</h3>
+            <p>
+              Together they reveal learning progress, underfitting, and
+              possible overfitting.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="summary">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">07 · Summary</p>
+            <h2>Why neural-network visuals matter</h2>
+          </div>
+
+          <p>
+            Clear diagrams connect mathematical operations with model behavior
+            and stakeholder decisions.
+          </p>
+        </div>
+
+        <div class="summary-grid">
+          <div>
+            <article class="summary-point">
+              <span>01</span>
+              <div>
+                <h3>Explain architecture</h3>
+                <p>
+                  Show how inputs, hidden representations, and outputs relate.
+                </p>
+              </div>
+            </article>
+
+            <article class="summary-point">
+              <span>02</span>
+              <div>
+                <h3>Diagnose training behavior</h3>
+                <p>
+                  Make underfitting, overfitting, and unstable updates easier
+                  to discuss.
+                </p>
+              </div>
+            </article>
+
+            <article class="summary-point">
+              <span>03</span>
+              <div>
+                <h3>Document model decisions</h3>
+                <p>
+                  Record why features, depth, activations, loss functions, and
+                  optimizers were selected.
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <aside class="continuity-card">
+            <p class="eyebrow">Portfolio continuity</p>
+
+            <h3>From algorithm selection to model understanding</h3>
+
+            <p>
+              The earlier field guide explains which algorithms fit a problem.
+              This artifact explains how a neural network transforms data,
+              learns from error, and communicates uncertainty.
+            </p>
+
+            <a href="index.html">
+              Return to the Algorithm Types field guide →
+            </a>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="reflection">
+      <div class="page reflection-box">
+        <div>
+          <p class="kicker">08 · Portfolio reflection</p>
+          <h2>Learning through visualization</h2>
+          <p class="reflection-meta">
+            175 words · Professional portfolio artifact
+          </p>
+        </div>
+
+        <p class="reflection-copy">
+          Creating this neural-network visualization strengthened my
+          understanding of how architecture and training choices shape model
+          behavior. Mapping the forward pass from input features through hidden
+          layers to an output made weights, biases, and activation functions
+          feel less abstract because I could see how each stage transforms
+          information. TensorFlow Playground added an experimental perspective.
+          Changing the dataset, noise level, selected features, and hidden-layer
+          depth showed that model capacity must match the structure and
+          difficulty of the problem. Simple boundaries required little
+          complexity, while circular or spiral patterns benefited from
+          nonlinear features and additional neurons. Higher noise made the
+          learned boundary less stable and increased the need to compare
+          training and test loss. I also learned that a visually complex network
+          is not automatically a better model; unnecessary depth can increase
+          computation and overfitting risk. Adding this artifact to my
+          professional portfolio extends my earlier algorithm guide by showing
+          how a model learns, not only which algorithm to select. It demonstrates
+          my ability to connect technical concepts with clear visual
+          communication for analysts, developers, and business stakeholders.
+        </p>
+      </div>
+    </section>
+
+    <section class="references" id="references">
+      <div class="page">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Academic foundation</p>
+            <h2>References</h2>
+          </div>
+
+          <p>
+            Sources are presented in APA-style reference form and link to
+            primary or official materials.
+          </p>
+        </div>
+
+        <div class="reference-list">
+          <p>
+            Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016).
+            <em>Deep learning</em>. MIT Press.
+            <a href="https://www.deeplearningbook.org/contents/mlp.html">
+              https://www.deeplearningbook.org/contents/mlp.html
+            </a>
+          </p>
+
+          <p>
+            Google for Developers. (n.d.). <em>Backpropagation</em>.
+            Machine Learning Crash Course.
+            <a
+              href="https://developers.google.com/machine-learning/crash-course/neural-networks/backpropagation"
+            >
+              https://developers.google.com/machine-learning/crash-course/neural-networks/backpropagation
+            </a>
+          </p>
+
+          <p>
+            Kingma, D. P., &amp; Ba, J. (2014). Adam: A method for
+            stochastic optimization. <em>arXiv</em>.
+            <a href="https://arxiv.org/abs/1412.6980">
+              https://arxiv.org/abs/1412.6980
+            </a>
+          </p>
+
+          <p>
+            Nair, V., &amp; Hinton, G. E. (2010). Rectified linear units
+            improve restricted Boltzmann machines. In
+            <em>
+              Proceedings of the 27th International Conference on Machine
+              Learning
+            </em>.
+            <a href="https://icml.cc/2010/papers/432.pdf">
+              https://icml.cc/2010/papers/432.pdf
+            </a>
+          </p>
+
+          <p>
+            TensorFlow. (n.d.). <em>A neural network playground</em>.
+            <a href="https://playground.tensorflow.org/">
+              https://playground.tensorflow.org/
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page footer-inner">
+      <div>
+        <strong>Tianfan Wu</strong>
+        <p>
+          DeVoe School of Business, Technology and Leadership ·
+          Indiana Wesleyan University
+        </p>
+      </div>
+
+      <p>
+        <strong>AIML-501-01R3A: Model Development</strong><br>
+        2.4 Portfolio Artifact · Visualizing Neural Networks
+      </p>
+
+      <a href="#top"><strong>Back to top ↑</strong></a>
+    </div>
+  </footer>
+</body>
+</html>
